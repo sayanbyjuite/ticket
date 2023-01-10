@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ITicketDao {
-     Boolean createTicket(Ticket ticket);
+     UUID createTicket(Ticket ticket);
      List<Ticket> getAllTickets();
      Optional<Ticket> getTicketById(UUID id);
      List<Ticket> getTicketsByStatus(Status ticketStatus);

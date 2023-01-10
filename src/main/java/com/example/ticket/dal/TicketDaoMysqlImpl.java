@@ -2,51 +2,113 @@ package com.example.ticket.dal;
 
 import com.example.ticket.model.Status;
 import com.example.ticket.model.Ticket;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.sql.ResultSet;
+import java.util.*;
 
 @Repository("mysql")
 public class TicketDaoMysqlImpl implements  ITicketDao{
 
     List<Ticket> DB = new ArrayList<>();
+    private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public TicketDaoMysqlImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
-    public Boolean createTicket(Ticket ticket) {
-        DB.add(ticket);
-        return Boolean.TRUE;
+    public UUID createTicket(Ticket ticket) {
+        String update = "INSERT into ticket (title, id, subject, status, createdBy) VALUES (?, ?, ?, ?, ?)";
+        UUID id = UUID.randomUUID();
+        jdbcTemplate.update(update, new Object[]{
+                ticket.getTitle(),
+                id.toString(),
+                ticket.getSubject(),
+                Status.OPEN.toString(),
+                ticket.getCreatedBy()});
+        return id;
     }
 
     @Override
     public List<Ticket> getAllTickets() {
-        return DB;
+        String query = "Select * from ticket";
+        return jdbcTemplate.query(query,(resultSet, i) -> {
+            return new Ticket(
+                    resultSet.getString("title"),
+                    UUID.fromString(resultSet.getString("id")),
+                    resultSet.getString("subject"),
+                    Status.valueOf(resultSet.getString("status")),
+                    resultSet.getInt("createdBy"),
+                    resultSet.getTimestamp("createdAt"),
+                    resultSet.getTimestamp("updatedAt")
+            );
+        });
     }
 
     @Override
     public List<Ticket> getTicketsByStatus(Status ticketStatus) {
-        return DB;
+        String query = "Select * from ticket where status = ?";
+        return jdbcTemplate.query(query, new Object[]{ticketStatus.toString()},(resultSet, i) -> {
+            return new Ticket(
+                    resultSet.getString("title"),
+                    UUID.fromString(resultSet.getString("id")),
+                    resultSet.getString("subject"),
+                    Status.valueOf(resultSet.getString("status")),
+                    resultSet.getInt("createdBy"),
+                    resultSet.getTimestamp("createdAt"),
+                    resultSet.getTimestamp("updatedAt")
+            );
+        });
     }
 
     @Override
     public Optional<Ticket> getTicketById(UUID id) {
-        return Optional.empty();
+        String query = "Select * from ticket where id = ?";
+        return Optional.ofNullable(
+                jdbcTemplate.queryForObject(
+                        query,
+                        new Object[]{id.toString()},
+                        Ticket.class)
+        );
     }
 
     @Override
     public List<Ticket> getUserTickets(int id) {
-        return DB;
+        String query = "Select * from ticket where status = ?";
+        return jdbcTemplate.query(query, new Object[]{id},(resultSet, i) -> {
+            return new Ticket(
+                    resultSet.getString("title"),
+                    UUID.fromString(resultSet.getString("id")),
+                    resultSet.getString("subject"),
+                    Status.valueOf(resultSet.getString("status")),
+                    resultSet.getInt("createdBy"),
+                    resultSet.getTimestamp("createdAt"),
+                    resultSet.getTimestamp("updatedAt")
+            );
+        });
     }
 
     @Override
     public Boolean updateTicket(UUID id, Ticket updatedTicket) {
-        return null;
+//        String update = "Update ticket where title, id, subject, status, createdBy) VALUES (?, ?, ?, ?, ?)";
+//        UUID id = UUID.randomUUID();
+//        jdbcTemplate.update(update, new Object[]{
+//                updatedTicket.getTitle(),
+//                id.toString(),
+//                updatedTicket.getSubject(),
+//                Status.OPEN.toString(),
+//                updatedTicket.getCreatedBy()
+//        });
+        return Boolean.TRUE;
     }
 
     @Override
     public Boolean deleteTicket(UUID id) {
-        return null;
+
+        return Boolean.TRUE;
     }
 }
