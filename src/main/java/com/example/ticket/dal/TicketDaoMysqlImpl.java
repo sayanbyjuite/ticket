@@ -72,13 +72,23 @@ public class TicketDaoMysqlImpl implements  ITicketDao{
                 jdbcTemplate.queryForObject(
                         query,
                         new Object[]{id.toString()},
-                        Ticket.class)
+                        (resultSet, i) -> {
+                            return new Ticket(
+                                    resultSet.getString("title"),
+                                    UUID.fromString(resultSet.getString("id")),
+                                    resultSet.getString("subject"),
+                                    Status.valueOf(resultSet.getString("status")),
+                                    resultSet.getInt("createdBy"),
+                                    resultSet.getTimestamp("createdAt"),
+                                    resultSet.getTimestamp("updatedAt")
+                            );
+                        })
         );
     }
 
     @Override
     public List<Ticket> getUserTickets(int id) {
-        String query = "Select * from ticket where status = ?";
+        String query = "Select * from ticket where createdBy = ?";
         return jdbcTemplate.query(query, new Object[]{id},(resultSet, i) -> {
             return new Ticket(
                     resultSet.getString("title"),
@@ -94,21 +104,26 @@ public class TicketDaoMysqlImpl implements  ITicketDao{
 
     @Override
     public Boolean updateTicket(UUID id, Ticket updatedTicket) {
-//        String update = "Update ticket where title, id, subject, status, createdBy) VALUES (?, ?, ?, ?, ?)";
-//        UUID id = UUID.randomUUID();
-//        jdbcTemplate.update(update, new Object[]{
-//                updatedTicket.getTitle(),
-//                id.toString(),
-//                updatedTicket.getSubject(),
-//                Status.OPEN.toString(),
-//                updatedTicket.getCreatedBy()
-//        });
+        String query = "SELECT COUNT(*) FROM TICKET WHERE id = ?";
+        int count = jdbcTemplate.queryForObject(query, new Object[]{id.toString()}, Integer.class);
+        if(count == 0) return Boolean.FALSE;
+        String update = "UPDATE ticket SET title = ?, subject = ?, status = ? WHERE id = ?";
+        jdbcTemplate.update(update, new Object[]{
+                updatedTicket.getTitle(),
+                updatedTicket.getSubject(),
+                updatedTicket.getStatus().toString(),
+                id.toString()
+        });
         return Boolean.TRUE;
     }
 
     @Override
     public Boolean deleteTicket(UUID id) {
-
+        String query = "SELECT COUNT(*) FROM TICKET WHERE id = ?";
+        int count = jdbcTemplate.queryForObject(query, new Object[]{id.toString()}, Integer.class);
+        if(count == 0) return Boolean.FALSE;
+        String delete = "DELETE FROM ticket WHERE id = ?";
+        jdbcTemplate.update(delete, new Object[]{id.toString()});
         return Boolean.TRUE;
     }
 }
