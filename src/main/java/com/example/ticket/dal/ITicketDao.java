@@ -9,10 +9,7 @@ import java.util.UUID;
 
 public interface ITicketDao {
      UUID createTicket(Ticket ticket);
-     List<Ticket> getAllTickets();
-     Optional<Ticket> getTicketById(UUID id);
-     List<Ticket> getTicketsByStatus(Status ticketStatus);
-     List<Ticket> getUserTickets(int id);
+     List<Ticket> getTickets(Optional<UUID> id, Optional<Status> ticketStatus, Optional<Integer> userId);
      Boolean updateTicket(UUID id, Ticket updatedTicket);
      Boolean deleteTicket(UUID id);
 }

@@ -21,20 +21,8 @@ public class TicketService {
     public UUID createTicket(Ticket ticket){
         return ticketDao.createTicket(ticket);
     }
-
-    public List<Ticket> getAllTickets(){
-        return ticketDao.getAllTickets();
-    }
-
-    public Optional<Ticket> getTicketById(UUID id){
-        return ticketDao.getTicketById(id);
-    }
-
-    public List<Ticket> getTicketsByStatus(Status ticketStatus){
-        return ticketDao.getTicketsByStatus(ticketStatus);
-    }
-    public List<Ticket> getUserTickets(int id){
-        return ticketDao.getUserTickets(id);
+    public List<Ticket> getTickets(Optional<UUID> id, Optional<Status> ticketStatus, Optional<Integer> userId) {
+        return ticketDao.getTickets(id, ticketStatus, userId);
     }
     public Boolean updateTicket(UUID id, Ticket updatedTicket){
         return ticketDao.updateTicket(id, updatedTicket);

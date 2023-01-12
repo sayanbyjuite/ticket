@@ -1,8 +1,12 @@
 package com.example.ticket.controller;
 
+import com.example.ticket.TicketApplication;
 import com.example.ticket.model.Status;
 import com.example.ticket.model.Ticket;
 import com.example.ticket.service.TicketService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +21,8 @@ import java.util.UUID;
 public class TicketController {
     private final TicketService ticketService;
 
+    private static final Logger logger = LogManager.getLogger(TicketController.class);
+
     @Autowired
     public TicketController(TicketService ticketService) {
         this.ticketService = ticketService;
@@ -24,6 +30,8 @@ public class TicketController {
 
     @PostMapping
     public ResponseEntity<String> createTicket(@RequestBody Ticket ticket) {
+
+        logger.info("Create ticket called");
         return ResponseEntity.ok(ticketService.createTicket(ticket).toString());
     }
 
@@ -31,19 +39,7 @@ public class TicketController {
     public ResponseEntity<List<Ticket>> getTickets(@RequestParam("id") Optional<UUID> id,
                                                    @RequestParam("status") Optional<Status> ticketStatus,
                                                    @RequestParam("userId") Optional<Integer> userId) {
-        if (id.isPresent()) {
-            Optional<Ticket> ticket = ticketService.getTicketById(id.get());
-            List<Ticket> response = new ArrayList<>();
-            if (ticket.isPresent()) response.add(ticket.get());
-            return ResponseEntity.ok(response);
-        } else if (ticketStatus.isPresent()) {
-            return ResponseEntity.ok(ticketService.getTicketsByStatus(ticketStatus.get()));
-        } else if (userId.isPresent()) {
-            return ResponseEntity.ok(ticketService.getUserTickets(userId.get().intValue()));
-        } else {
-            return ResponseEntity.ok(ticketService.getAllTickets());
-        }
-
+        return ResponseEntity.ok(ticketService.getTickets(id, ticketStatus, userId));
     }
 
     @PutMapping(path = "{id}")
