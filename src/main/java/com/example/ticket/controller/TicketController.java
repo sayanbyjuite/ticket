@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RequestMapping("api/v1/ticket")
 @RestController
@@ -31,25 +30,24 @@ public class TicketController {
     @PostMapping
     public ResponseEntity<String> createTicket(@RequestBody Ticket ticket) {
 
-        logger.info("Create ticket called");
         return ResponseEntity.ok(ticketService.createTicket(ticket).toString());
     }
 
     @GetMapping
-    public ResponseEntity<List<Ticket>> getTickets(@RequestParam("id") Optional<UUID> id,
+    public ResponseEntity<List<Ticket>> getTickets(@RequestParam("id") Optional<Long> id,
                                                    @RequestParam("status") Optional<Status> ticketStatus,
                                                    @RequestParam("userId") Optional<Integer> userId) {
         return ResponseEntity.ok(ticketService.getTickets(id, ticketStatus, userId));
     }
 
     @PutMapping(path = "{id}")
-    public ResponseEntity<Boolean> updateTicket(@PathVariable("id") UUID id,
+    public ResponseEntity<Boolean> updateTicket(@PathVariable("id") Long id,
                                                 @RequestBody Ticket updatedTicket) {
         return ResponseEntity.ok(ticketService.updateTicket(id, updatedTicket));
     }
 
     @DeleteMapping(path = "{id}")
-    public ResponseEntity<Boolean> deleteTicket(@PathVariable("id") UUID id) {
+    public ResponseEntity<Boolean> deleteTicket(@PathVariable("id") Long id) {
         return ResponseEntity.ok(ticketService.deleteTicket(id));
     }
 

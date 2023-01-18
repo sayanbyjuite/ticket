@@ -1,17 +1,23 @@
 package com.example.ticket.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.UUID;
 
 @Getter
+@Setter
+@Entity
+@Table(name = "ticket")
 public class Ticket {
     public Ticket(@JsonProperty("title") String title,
-                  @JsonProperty("ticketId") UUID ticketId,
+                  @JsonProperty("ticketId") Long ticketId,
                   @JsonProperty("subject") String subject,
                   @JsonProperty("status") Status status,
                   @JsonProperty("createdBy") int createdBy,
@@ -26,11 +32,33 @@ public class Ticket {
         this.updatedAt = updatedAt;
     }
 
-    private final String title;
-    private final UUID ticketId;
-    private final String subject;
-    private final Status status;
-    private final int createdBy;
-    private final Timestamp createdAt;
-    private final Timestamp updatedAt;
+    public Ticket() {
+        this.title = "";
+        this.subject = "";
+        this.status = Status.NOTSET;
+    }
+
+    @Column(name = "title")
+    private String title;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ticketId")
+    private Long ticketId;
+
+    @Column(name = "subject")
+    private String subject;
+
+    @Column(name = "status")
+    private Status status;
+
+    @Column(name = "createdBy")
+    private int createdBy;
+
+    @Column(name = "createdAt")
+    @CreationTimestamp
+    private Timestamp createdAt;
+
+    @Column(name = "updatedAt")
+    @UpdateTimestamp
+    private Timestamp updatedAt;
 }
