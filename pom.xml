@@ -12,7 +12,7 @@
 	<artifactId>ticket</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ticket</name>
-	<description>Ticket management system</description>
+	<description>Ticket management is an awesome system</description>
 	<properties>
 		<java.version>19</java.version>
 	</properties>
